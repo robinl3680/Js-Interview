@@ -1,22 +1,33 @@
 let myStateArray = [];
 let renderIndex;
 const myCustomStateHook = (initialState) => {
-  const currentIndex = renderIndex;
-  if (myStateArray[currentIndex] === undefined) {
-    myStateArray[currentIndex] = {
-      state: initialState,
-      setState: (newState) => {
-        if (typeof newState === "function") {
-          myStateArray[currentIndex].state = newState(
-            myStateArray[currentIndex].state
-          );
-        } else {
-          myStateArray[currentIndex].state = newState;
-        }
-      },
-    };
+  let currentIndex = renderIndex++;
+  const [, rerender] = useReducer(() => ({}));
+
+  const forceUpdate = () => {
+    currentIndex = 0;
+    rerender({});
+  };
+
+  if (myStateArray[currentIndex]) {
+    return myStateArray[currentIndex];
   }
-  renderIndex++;
+
+  function setState(newState) {
+    if (typeof newState === "function") {
+      myStateArray[currentIndex].state = newState(
+        myStateArray[currentIndex].state
+      );
+    } else {
+      myStateArray[currentIndex].state = newState;
+    }
+    forceUpdate();
+  }
+
+  const currentState = { state: initialState, setState };
+
+  myStateArray[currentIndex] = currentState;
+
   return [
     myStateArray[currentIndex].state,
     myStateArray[currentIndex].setState,
@@ -96,3 +107,5 @@ const myCustomUseCallbackHook = (callback, dependencies) => {
   }
   return savedRef.current.callback;
 };
+
+const myCustomUseRefHook = (initialValue) => {};
