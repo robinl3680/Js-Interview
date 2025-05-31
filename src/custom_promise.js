@@ -1,29 +1,29 @@
 class MyPromise {
   constructor(executor) {
-    this.state = 'pending';
+    this.state = "pending";
     this.value = undefined;
     this.error = undefined;
     this.resolveCb = [];
     this.rejectCb = [];
     const resolve = (value) => {
-      this.state = 'fulfilled';
+      this.state = "fulfilled";
       this.value = value;
       this.resolveCb.forEach((cb) => cb(this.value));
-    }
+    };
     const reject = (error) => {
-      this.state = 'rejected';
+      this.state = "rejected";
       this.error = error;
       this.rejectCb.forEach((cb) => cb(this.error));
-    }
+    };
     try {
       queueMicrotask(() => executor(resolve, reject));
-    } catch(err) {
-      reject(err)
+    } catch (err) {
+      reject(err);
     }
   }
   then(resHandler, rejHandler) {
     return new MyPromise((resolve, reject) => {
-      if(this.state === 'pending') {
+      if (this.state === "pending") {
         this.resolveCb.push(() => {
           try {
             const result = resHandler(this.value);
@@ -32,8 +32,8 @@ class MyPromise {
             } else {
               resolve(result);
             }
-          } catch(err) {
-            reject(err)
+          } catch (err) {
+            reject(err);
           }
         });
         this.rejectCb.push(() => {
@@ -44,7 +44,7 @@ class MyPromise {
             } else {
               reject(result);
             }
-          } catch(err) {
+          } catch (err) {
             reject(err);
           }
         });
@@ -57,8 +57,8 @@ class MyPromise {
           } else {
             resolve(result);
           }
-        } catch(err) {
-          reject(err)
+        } catch (err) {
+          reject(err);
         }
       }
       if (this.state === "rejected") {
@@ -81,7 +81,7 @@ const p1 = new MyPromise((resolve, reject) => {
   setTimeout(() => resolve("resolved first one"), 1000);
 });
 
-p1.then((res) => {a
+p1.then((res) => {
   console.log(res);
   return new MyPromise((resolve) => {
     setTimeout(() => resolve("resolved second one"), 1000);
